@@ -1,1 +1,68 @@
+# MSA - Spring Cloud
 
+## Spring Cloud란?
+
+Spring Cloud는 스프링 기반의 마이크로서비스 아키텍처를 구축하고 운영하기 위한 도구들의 집합입니다.  
+클라우드 환경에서 마이크로서비스 애플리케이션을 빠르고 효율적으로 구축하고 실행하는 데 도움이 되는 여러 기능을 제공합니다.
+
+---
+
+## 스프링 클라우드의 주요 기능
+
+### 1. 서비스 디스커버리
+- Eureka, Consul, Zookeeper 등의 모듈을 사용하여 서비스 위치를 자동으로 등록/탐색
+- 마이크로서비스 간의 동적 위치 탐색 가능
+
+### 2. 클라이언트 로드 밸런싱
+- Ribbon, Spring Cloud LoadBalancer 사용
+- 서비스 인스턴스 간의 요청 분산 처리
+
+### 3. 서킷 브레이커
+- Hystrix, Resilience4j 등의 모듈 사용
+- 장애 전파를 막고 시스템 전체의 복원력 향상
+
+### 4. 구성 관리
+- Spring Cloud Config를 통해 중앙 집중식 구성 관리
+- Git 또는 Native 파일 시스템으로 설정 소스 관리 가능
+
+### 5. API 게이트웨이
+- Zuul 또는 Spring Cloud Gateway 사용
+- 인증, 인가, 로깅, 라우팅, CORS 등 공통 기능 처리
+
+### 6. 분산 추적
+- Spring Cloud Sleuth + Zipkin 연동
+- 서비스 호출 간 연관된 로그 추적 가능
+
+### 7. 배포 및 관리
+- Docker 및 Kubernetes 환경과의 통합
+- 유연한 마이크로서비스 배포 구조 가능
+
+---
+
+## Spring Cloud Gateway
+
+### API Gateway란?
+- 모든 요청을 하나의 진입점(API Gateway)을 통해 처리
+- 인증, 라우팅, 로깅, 속도 제한 등 공통 책임 수행
+
+### Spring Cloud Gateway(SCG)
+- Spring WebFlux 기반의 비동기 논블로킹 API 게이트웨이
+- Netty 서버 기반으로 동작
+
+#### 주요 기능
+- REST API 및 WebSocket API 생성
+- 라우팅, 필터링, 인증, 로깅, 모니터링 제공
+
+#### 필터 구조
+- **Pre Filter**: 요청 전 검증/처리
+- **Post Filter**: 응답 후 로깅/변형 처리
+
+---
+
+## 요약
+
+Spring Cloud는 MSA를 실현하기 위한 핵심 프레임워크로,
+각 구성 요소들이 마이크로서비스의 안정성과 확장성을 보장하도록 설계되어 있습니다.
+
+Spring Cloud Gateway를 활용하면 API Gateway로서의 역할을 손쉽게 구현할 수 있으며,
+마이크로서비스 아키텍처의 필수 컴포넌트들을 유기적으로 연결하고 관리할 수 있습니다.
