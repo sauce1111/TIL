@@ -1,0 +1,92 @@
+# MSA - MicroService
+
+## Software Architecture
+
+### History of IT System
+
+| 시기        | 시스템 특징                                                                 |
+|-------------|------------------------------------------------------------------------------|
+| 1960~1980   | **Fragile, Cowboys**<br>하드웨어 중심(사양, 성격)에 맞춰 서비스 구성, 고가 서비스 기능 수정 및 변경 어려움, 깨지기 쉬운 시스템 |
+| 1990~2000   | **Robust, Distributed**<br>분산 시스템, 서비스 변화에도 성능/안정성 향상 |
+| 2010~       | **Resilient/Anti-Fragile, Cloud Native**<br>확장성, 안정성, 변화에도 탄력적 운영 |
+
+#### Antifragile 시스템의 핵심 요소
+
+- **Auto Scaling**: 리소스 사용량에 따라 자동으로 확장되는 기능
+- **Microservices**: 기존의 모놀리식 구조를 분리하여 독립적으로 개발 및 배포 가능한 서비스로 구성
+- **Chaos Engineering**: 예측 불가능한 상황에서도 시스템의 안정성을 유지하기 위한 실험적 접근
+- **Continuous Deployment**: CI/CD 파이프라인을 통한 지속적인 통합 및 배포
+
+### Cloud Native Architecture의 특징
+
+- **확장 가능한 아키텍처**: 시스템의 부하 분산 및 가용성 보장
+- **탄력적 아키텍처**: 서비스의 생성, 통합, 배포를 통해 비즈니스 환경 변화에 빠르게 대응
+- **장애 격리**: 특정 서비스에 오류가 발생해도 다른 서비스에 영향을 주지 않도록 설계
+
+### Cloud Native Application 구성 요소
+
+- **Microservices**
+- **CI/CD**
+- **DevOps**
+- **Containers 가상화**
+
+---
+
+## 12 Factors + 3 (Pivotal 확장 요소)
+
+### Heroku 12 Factors
+
+1. **Codebase**: 하나의 코드베이스, 여러 배포
+2. **Dependencies**: 명시적 선언과 격리
+3. **Config**: 환경에 따라 다른 설정 분리
+4. **Backing services**: 연결 가능한 외부 서비스 (DB, MQ 등)
+5. **Build, release, run**: 빌드, 릴리즈, 실행 단계 구분
+6. **Processes**: 애플리케이션은 stateless한 프로세스로 실행
+7. **Port binding**: 자체적으로 HTTP 포트를 열어 서비스를 제공
+8. **Concurrency**: 프로세스를 복제하여 수평 확장
+9. **Disposability**: 빠른 시작과 정상 종료 보장
+10. **Dev/prod parity**: 개발과 운영 환경 일치
+11. **Logs**: 로그는 이벤트 스트림으로 처리
+12. **Admin processes**: 일회성 관리 명령은 별도로 실행
+
+### +3 추가 요소 (Pivotal)
+
+- **API First**
+- **Telemetry**
+- **Authentication & Authorization**
+
+---
+
+## Monolith vs Microservice
+
+### Monolithic Architecture
+
+**장점**
+- 개발, 테스트 단순
+- 배포 단순
+
+**단점**
+- 확장성 낮음
+- 장애 전파
+
+### Microservice Architecture
+
+**장점**
+- 독립적 배포 가능
+- 다양한 기술 스택
+- 높은 확장성
+
+**단점**
+- 서비스 간 통신 복잡
+- 운영 난이도 증가
+
+---
+
+## SOA vs MSA
+
+| 구분        | SOA                               | MSA                                     |
+|-------------|------------------------------------|------------------------------------------|
+| 중심        | 비즈니스 프로세스                 | 독립적 마이크로 서비스                  |
+| 통신 방식   | ESB 기반 메시징                    | REST, HTTP, 메시지 브로커               |
+| 배포        | 단위 모듈 배포 어려움              | 서비스 단위 배포 쉬움                   |
+| 기술 스택   | 제한적                             | 자유로운 선택                           |
