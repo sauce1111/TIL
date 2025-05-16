@@ -1,0 +1,150 @@
+# Spring Cloud로 배우는 MSA
+
+최근 새로운 회사로 이직하면서 **MSA(Microservices Architecture)**에 대한 관심이 깊어졌습니다.
+제가 합류한 팀에서는 MSA를 기반으로 한 아키텍처를 실무에 적용하고 있었고, 내부적으로는 이를 더 쉽게 구현할 수 있도록 돕는 플랫폼 솔루션도 개발 중이었습니다.
+
+이전까지는 주로 모놀리식 구조로 서비스 개발을 해왔기 때문에, 이번 기회를 통해 MSA의 구조적 특징과 각 컴포넌트의 역할을 제대로 이해하고 싶었습니다. 그래서 Inflearn의 강의를 수강하며 예제 프로젝트를 직접 구성해보며 학습한 내용을 정리해보게 되었습니다.
+
+이번 포스팅에서는 그 첫 번째 단계로, 서비스 디스커버리(Service Discovery) 환경을 구성해보았습니다. 각 서비스가 독립적으로 등록되고 서로를 인식할 수 있도록, Spring Cloud의 Eureka를 기반으로 한 간단한 MSA 예제를 만들어봤습니다.
+
+---
+
+## 문제 정의 및 목표 설정
+서비스 규모가 커지면 하나의 거대한 애플리케이션(monolith) 구조는 여러 가지 한계가 있습니다. 배포가 어려워지고, 하나의 기능 장애가 전체 시스템에 영향을 주는 일이 발생하기 때문이죠.
+
+이 문제를 해결하기 위해 **MSA(Microservices Architecture)** 구조를 도입하는것을 고려해 볼 수 있습니다.
+
+---
+
+## MSA 개념 간단 정리
+
+### 마이크로서비스란?
+- 하나의 애플리케이션을 여러 개의 작은 서비스로 나누어 구성
+- 서비스 간에는 API를 통해 통신하며, 독립적으로 배포/확장 가능
+
+### Service Discovery란?
+- 각 서비스가 자신을 등록하고, 다른 서비스를 찾을 수 있도록 해주는 시스템
+- 대표적인 도구로 Netflix의 **Eureka** 사용
+
+### Spring Cloud Eureka란?
+- Spring Boot 기반의 애플리케이션에서 손쉽게 Eureka 서버와 클라이언트를 구성할 수 있도록 지원하는 라이브러리
+
+---
+
+## 사용 기술
+
+- **Spring Boot 3.x**
+- **Spring Cloud (Eureka)**
+- Java 17
+- Gradle 빌드 툴
+
+---
+
+## 서비스 설정 및 역할 설명
+
+### 1. discovery-service – 서비스 디렉토리
+
+#### 핵심 역할
+- 모든 서비스가 등록되고 서로를 검색할 수 있도록 하는 **중앙 등록소**
+
+#### CODE
+
+**Main Class**
+
+```java
+@SpringBootApplication
+@EnableEurekaServer // discovery 서버로 설정
+public class DiscoveryServiceApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(DiscoveryServiceApplication.class, args);
+    }
+
+}
+```
+
+**application.yml**
+
+```
+# discovery 서버 port 설정
+server:
+  port: 8761
+
+spring:
+  application:
+    name: discovery-service
+
+# eureka server 역할의 프로젝트이므로 client 는 생성하지 않도록 설정
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+```
+
+> 위 설정은 자신을 등록할 필요가 없는 서버임을 명시합니다.
+
+---
+
+### 2. user-service – 서비스 client
+
+#### 핵심 역할
+- 사용자 도메인 비즈니스 로직 처리
+- discovery-service에 등록됨으로써 다른 서비스와 연결 가능
+
+#### CODE
+
+**Main Class**
+```java
+@SpringBootApplication
+@EnableDiscoveryClient // client 로 설정
+public class UserServiceApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(UserServiceApplication.class, args);
+    }
+
+}
+
+```
+
+**application.yml**
+```yaml
+# 랜덤 포트로 설정
+server:
+  port: 0
+
+spring:
+  application:
+    name: user-service
+
+# client 로 설정
+eureka:
+  instance:
+    # 랜덤포트 사용시 discovery 에서 인스턴스를 여러개 띄워도 0번 포트 하나만 보이는 이슈를 해결하기 위한 instance_id 설정
+    instance-id: ${spring.cloud.client.hostname}:${spring.application.instance_id:${random.value}}
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    # 서버의 위치에 microservice 를 저장하겠다는 뜻
+    service-url:
+      defaultZone: http://127.0.0.1:8761/eureka
+```
+
+> \`defaultZone\`을 통해 discovery-service의 위치를 명시합니다.
+
+---
+
+
+1. **Eureka 의존성 추가 순서**: Spring Boot 3.x에서는 \`spring-cloud-starter-netflix-eureka-server\`와 \`spring-cloud-starter-netflix-eureka-client\`의 호환성에 주의해야 합니다. Spring Cloud 버전 관리에 꼭 BOM 설정을 사용해야 합니다.
+
+2. **자기 자신 등록 막기**: Eureka Server 설정 시 \`register-with-eureka: false\`를 빠뜨리면 자기 자신을 다시 등록하려는 시도가 반복되어 부하가 발생할 수 있습니다.
+
+3. **서비스 이름 명확하게 구분**: 각 서비스의 \`spring.application.name\`은 유일해야 하며, Eureka UI 상에서 식별에 활용됩니다.
+
+
+---
+
+## 결론
+
+
+이번 포스팅은 Spring Cloud를 사용해 MSA의 첫 단추인 **서비스 디스커버리 환경**을 구성해보는 데 집중했습니다. 단순한 예제이지만, MSA 구성 요소의 핵심 개념을 직접 손으로 구현하면서 이해하는 데 큰 도움이 되었고, 앞으로 프로젝트 확장과 실무 적용에도 기반이 될 수 있는 좋은 시작이 되었다고 생각합니다.
